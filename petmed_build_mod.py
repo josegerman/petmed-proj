@@ -167,9 +167,9 @@ def show_ui(qa, prompt_to_user="How may I help you?"):
 @st.cache_resource
 def get_chain(openai_api_key=None):
     embeddings = OpenAIEmbeddings(openai_api_key=LLMKEY, model="text-embedding-3-small") 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    persistent_directory = os.path.join(current_dir, "db", "chroma_petmed_db")
-    db = Chroma(persist_directory=persistent_directory, embedding_function=embeddings)
+    #current_dir = os.path.dirname(os.path.abspath(__file__))
+    #persistent_directory = os.path.join(current_dir, "db", "chroma_petmed_db")
+    db = Chroma(persist_directory="./db", embedding_function=embeddings)
     ensemble_retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3},)
     chain = create_full_chain(ensemble_retriever,
                               openai_api_key=LLMKEY,
