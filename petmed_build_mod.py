@@ -167,7 +167,6 @@ def show_ui(qa, prompt_to_user="How may I help you?"):
 @st.cache_resource
 def get_chain(openai_api_key=None):
     embeddings = OpenAIEmbeddings(openai_api_key=LLMKEY, model="text-embedding-3-small") 
-    #proxy_embeddings = EmbeddingProxy(embeddings)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     persistent_directory = os.path.join(current_dir, "db", "chroma_petmed_db")
     db = Chroma(persist_directory=persistent_directory, embedding_function=embeddings)
@@ -190,4 +189,4 @@ run()
 # ==================================
 # To execute:
 # ==================================
-# streamlit run C:\_DEV\VSCode\Workspaces\petmed-proj\petmed_build.py
+# streamlit run C:\_DEV\VSCode\Workspaces\petmed-proj\petmed_build_mod.py
