@@ -3,7 +3,7 @@ import logging
 import os
 import streamlit as st
 
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from pathlib import Path
 from langchain.docstore.document import Document
 from langchain_community.document_loaders import TextLoader
@@ -31,27 +31,28 @@ from langchain_community.chat_message_histories import StreamlitChatMessageHisto
 # ==================================
 # Load .env variables
 # ==================================
-load_dotenv()
+#load_dotenv()
+LLMKEY = st.secrets['OPENAI_API_KEY']
 
 EMBED_DELAY = 0.02
 
 # ==================================
 # Split documents into chunks
 # ==================================
-def split_documents(docs):
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=0,
-        length_function=len,
-        is_separator_regex=False
-    )
-    contents = docs
-    if docs and isinstance(docs[0], Document):
-        contents = [doc.page_content for doc in docs]
-    texts = text_splitter.create_documents(contents)
-    n_chunks = len(texts)
-    print(f"Split into {n_chunks} chunks")
-    return texts
+#def split_documents(docs):
+#    text_splitter = RecursiveCharacterTextSplitter(
+#        chunk_size=1000,
+#        chunk_overlap=0,
+#        length_function=len,
+#        is_separator_regex=False
+#    )
+#    contents = docs
+#    if docs and isinstance(docs[0], Document):
+#        contents = [doc.page_content for doc in docs]
+#    texts = text_splitter.create_documents(contents)
+#    n_chunks = len(texts)
+#    print(f"Split into {n_chunks} chunks")
+#    return texts
 
 # ==================================
 # Vector store and embeddings
@@ -82,25 +83,25 @@ class EmbeddingProxy:
 # ==================================
 # Load files
 # ==================================
-def list_txt_files(data_dir="petmed_ai\data"):
-    paths = Path(data_dir).glob('**/*.csv')
-    for path in paths:
-        yield str(path)
+#def list_txt_files(data_dir="petmed_ai\data"):
+#    paths = Path(data_dir).glob('**/*.csv')
+#    for path in paths:
+#        yield str(path)
 
-def load_txt_files(data_dir="petmed_ai\data"):
-    docs = []
-    paths = list_txt_files(data_dir)
-    for path in paths:
-        print(f"Loading {path}")
-        loader = CSVLoader(path) # changed to csvloader
-        docs.extend(loader.load())
-    return docs
+#def load_txt_files(data_dir="petmed_ai\data"):
+#    docs = []
+#    paths = list_txt_files(data_dir)
+#    for path in paths:
+#        print(f"Loading {path}")
+#        loader = CSVLoader(path) # changed to csvloader
+#        docs.extend(loader.load())
+#    return docs
 
 # ==================================
 # Build model
 # ==================================
 def get_model():
-    chat_model = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+    chat_model = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", openai_api_key=LLMKEY)
     return chat_model
 
 # ==================================
@@ -164,7 +165,7 @@ def create_memory_chain(llm, base_chain, chat_memory):
 # Create full RAG chain
 # ==================================
 def create_full_chain(retriever, openai_api_key=None, chat_memory=ChatMessageHistory()):
-    model = get_model("ChatGPT", openai_api_key=os.environ["OPENAI_API_KEY"])
+    model = get_model()
     system_prompt = """You are a veterinarian for question-answering tasks. Answer the question based on the following context. If you don't know the answer, just say that you don't know. Use four sentences maximum and keep the answer concise.
     Context: {context}
     
@@ -217,12 +218,14 @@ def show_ui(qa, prompt_to_user="How may I help you?"):
 #    return ensemble_retriever_from_docs(embeddings=embeddings)
 
 def get_chain(openai_api_key=None):
-    embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-3-small") 
+    embeddings = OpenAIEmbeddings(openai_api_key=LLMKEY, model="text-embedding-3-small") 
     proxy_embeddings = EmbeddingProxy(embeddings)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    persistent_directory = os.path.join(current_dir, "db", "chroma_petmed_db")
     db = Chroma(persist_directory="./db", embedding_function=proxy_embeddings)
     ensemble_retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3},)
     chain = create_full_chain(ensemble_retriever,
-                              openai_api_key=os.environ["OPENAI_API_KEY"],
+                              openai_api_key=LLMKEY,
                               chat_memory=StreamlitChatMessageHistory(key="langchain_messages"))
     return chain
 
@@ -230,7 +233,7 @@ def get_chain(openai_api_key=None):
 # Run streamlit app
 # ==================================
 def run():
-    chain = get_chain(openai_api_key=os.environ["OPENAI_API_KEY"])
+    chain = get_chain(openai_api_key=LLMKEY)
     st.subheader("How can I help you with your pet?")
     show_ui(chain, "Please describe your pet's symptoms.")
 
