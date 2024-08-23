@@ -37,24 +37,6 @@ LLMKEY = st.secrets['OPENAI_API_KEY']
 EMBED_DELAY = 0.02
 
 # ==================================
-# Split documents into chunks
-# ==================================
-#def split_documents(docs):
-#    text_splitter = RecursiveCharacterTextSplitter(
-#        chunk_size=1000,
-#        chunk_overlap=0,
-#        length_function=len,
-#        is_separator_regex=False
-#    )
-#    contents = docs
-#    if docs and isinstance(docs[0], Document):
-#        contents = [doc.page_content for doc in docs]
-#    texts = text_splitter.create_documents(contents)
-#    n_chunks = len(texts)
-#    print(f"Split into {n_chunks} chunks")
-#    return texts
-
-# ==================================
 # Vector store and embeddings
 # ==================================
 class EmbeddingProxy:
@@ -185,10 +167,10 @@ def show_ui(qa, prompt_to_user="How may I help you?"):
 @st.cache_resource
 def get_chain(openai_api_key=None):
     embeddings = OpenAIEmbeddings(openai_api_key=LLMKEY, model="text-embedding-3-small") 
-    proxy_embeddings = EmbeddingProxy(embeddings)
+    #proxy_embeddings = EmbeddingProxy(embeddings)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     persistent_directory = os.path.join(current_dir, "db", "chroma_petmed_db")
-    db = Chroma(persist_directory=persistent_directory, embedding_function=proxy_embeddings)
+    db = Chroma(persist_directory=persistent_directory, embedding_function=embeddings)
     ensemble_retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3},)
     chain = create_full_chain(ensemble_retriever,
                               openai_api_key=LLMKEY,
