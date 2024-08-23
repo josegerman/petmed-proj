@@ -222,7 +222,7 @@ def get_chain(openai_api_key=None):
     proxy_embeddings = EmbeddingProxy(embeddings)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     persistent_directory = os.path.join(current_dir, "db", "chroma_petmed_db")
-    db = Chroma(persist_directory="./db", embedding_function=proxy_embeddings)
+    db = Chroma(persist_directory=persistent_directory, embedding_function=proxy_embeddings)
     ensemble_retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3},)
     chain = create_full_chain(ensemble_retriever,
                               openai_api_key=LLMKEY,
