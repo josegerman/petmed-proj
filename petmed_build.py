@@ -239,4 +239,4 @@ run()
 # ==================================
 # To execute:
 # ==================================
-# streamlit run C:\_DEV\VSCode\Workspaces\lanchain-llm\petmed_ai\petmed_build.py
+# streamlit run C:\_DEV\VSCode\Workspaces\petmed-proj\petmed_build.py
