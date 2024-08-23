@@ -53,7 +53,7 @@ class EmbeddingProxy:
 # Build model
 # ==================================
 def get_model():
-    chat_model = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", openai_api_key=LLMKEY)
+    chat_model = ChatOpenAI(temperature=0, model_name="gpt-4o", openai_api_key=LLMKEY)
     return chat_model
 
 # ==================================
