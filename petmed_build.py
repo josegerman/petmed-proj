@@ -67,36 +67,6 @@ class EmbeddingProxy:
             sleep(EMBED_DELAY)
             return self.embedding.embed_query(text)
 
-
-#def create_vector_db(embeddings=None):
-#    proxy_embeddings = EmbeddingProxy(embeddings)
-#    db = Chroma(persist_directory="./db", embedding_function=proxy_embeddings)
-#    return db
-
-# ==================================
-# Ensemble retriever
-# ==================================
-#def ensemble_retriever_from_docs():
-#    ensemble_retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3},)
-#    return ensemble_retriever
-
-# ==================================
-# Load files
-# ==================================
-#def list_txt_files(data_dir="petmed_ai\data"):
-#    paths = Path(data_dir).glob('**/*.csv')
-#    for path in paths:
-#        yield str(path)
-
-#def load_txt_files(data_dir="petmed_ai\data"):
-#    docs = []
-#    paths = list_txt_files(data_dir)
-#    for path in paths:
-#        print(f"Loading {path}")
-#        loader = CSVLoader(path) # changed to csvloader
-#        docs.extend(loader.load())
-#    return docs
-
 # ==================================
 # Build model
 # ==================================
@@ -213,10 +183,6 @@ def show_ui(qa, prompt_to_user="How may I help you?"):
         st.session_state.messages.append(message)
 
 @st.cache_resource
-#def get_retriever():
-#    embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-3-small") 
-#    return ensemble_retriever_from_docs(embeddings=embeddings)
-
 def get_chain(openai_api_key=None):
     embeddings = OpenAIEmbeddings(openai_api_key=LLMKEY, model="text-embedding-3-small") 
     proxy_embeddings = EmbeddingProxy(embeddings)
